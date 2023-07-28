@@ -19,21 +19,20 @@ app.get('/numbers', async (req, res) => {
 
     try {
         const fetchedData = await Promise.all(urls.map(fetchNumbers));
-    
 
         //merging
-        const mergedNumbers = fetchedData.reduce((acc, numbers) => {
+        const mergeNums = fetchedData.reduce((acc, numbers) => {
           acc.push(...numbers);
           return acc;
         }, []);
     
     //sorting in ascending
-    mergedNumbers.sort((a, b) => a - b);
+    mergeNums.sort((a, b) => a - b);
     
-    const uniqueNumbers = Array.from(new Set(mergedNumbers));
+    const uniqueNums = Array.from(new Set(mergeNum));
 
     res.json({ numbers: uniqueNumbers });
-    
+
       } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
       }
