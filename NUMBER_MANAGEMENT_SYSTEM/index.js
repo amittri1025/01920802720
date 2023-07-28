@@ -1,6 +1,10 @@
 const express = require('express');
 const app  = express();
 const PORT = process.env.PORT|| 8008;
+const axios = require('axios');
+
+
+app.use(express.urlencoded({ extended: true }));
 
 app.listen(PORT , ()=>{ console.log(`Number Management service is running at port ${PORT}`)});
 
@@ -29,9 +33,9 @@ app.get('/numbers', async (req, res) => {
     //sorting in ascending
     mergeNums.sort((a, b) => a - b);
     
-    const uniqueNums = Array.from(new Set(mergeNum));
+    const uniqueNums = Array.from(new Set(mergeNums));
 
-    res.json({ numbers: uniqueNumbers });
+    res.json({ numbers: uniqueNums });
 
       } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
