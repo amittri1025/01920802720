@@ -35,32 +35,54 @@ const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function App() {
+function App() {
+  const [token, setToken] = useState("");
   const [trains, setTrains] = useState([]);
 
   useEffect(() => {
-    // Function to fetch data from the API
+    const fetchToken = async () => {
+      try {
+        const response = await axios.post("http://20.244.56.144/train/auth", {
+          companyName: "Train Corp",
+          clientID: "16904bf6-a3df-452c-9347-d80621493008",
+          clientSecret: "OQoADgpPjFNhOhmD",
+          ownerName: "Shayama",
+          ownerEmail: "test@test.com",
+          rollNo: "01920802720",
+        });
+        const accessToken = response.data.access_token;
+        setToken(accessToken);
+      } catch (error) {
+        console.error("Error fetching token:", error);
+      }
+    };
+
+    fetchToken();
+  }, []);
+
+  useEffect(() => {
     const fetchTrains = async () => {
       try {
-        const token =
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTA1NDM1OTEsImNvbXBhbnlOYW1lIjoiVHJhaW4gQ29ycCIsImNsaWVudElEIjoiMTY5MDRiZjYtYTNkZi00NTJjLTkzNDctZDgwNjIxNDkzMDA4Iiwib3duZXJOYW1lIjoiIiwib3duZXJFbWFpbCI6IiIsInJvbGxObyI6IjAxOTIwODAyNzIwIn0.RUuoSUIh-eMNsm68HvnJK5oIrlq9yS0ysG4GzCDwwX0"  
-        const response = await axios.get(
-          "http://20.244.56.144:80/train/trains",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setTrains(response.data); // Assuming the API returns an array of trains
-        console.log(response.data);
+        if (token) {
+          const response = await axios.get(
+            "http://20.244.56.144/train/trains",
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          setTrains(response.data);
+        }
       } catch (error) {
         console.error("Error fetching trains:", error);
       }
     };
 
     fetchTrains();
-  }, []);
+  }, [token]);
+
+  console.log(trains);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -106,8 +128,8 @@ export default function App() {
               spacing={2}
               justifyContent="center"
             >
-              <Button variant="contained">Main call to action</Button>
-              <Button variant="outlined">Secondary action</Button>
+              <Button variant="contained">Contact Us</Button>
+              <Button variant="outlined">Train Running Status</Button>
             </Stack>
           </Container>
         </Box>
@@ -129,15 +151,26 @@ export default function App() {
                       // 16:9
                       pt: "56.25%",
                     }}
-                    image="https://source.unsplash.com/random?wallpapers"
+                    image="https://source.unsplash.com/random?train"
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography gutterBottom variant="h5" component="h2">
                       {card.trainName}
                     </Typography>
-                    <Typography>
-                      Train No . : {card.trainNumber}
-                    </Typography>
+                    <Typography>Delayed By. : {card.delayedBy} mins</Typography>
+                    <Typography gutterBottom variant="h6" component="h2">Price: </Typography>
+                    {Object.entries(card.price).map(([key, value]) => (
+                      <Typography>{key} : {value}Rs. </Typography>
+                    ))}
+                    <Typography gutterBottom variant="h6" component="h2">Departure Time</Typography>
+                    {Object.entries(card.departureTime).map(([key, value]) => (
+                      <Typography>{key} : {value}</Typography>
+                    ))}
+                    
+                    <Typography gutterBottom variant="h6" component="h2">Seat Available</Typography>
+                    {Object.entries(card.seatsAvailable).map(([key, value]) => (
+                      <Typography>{key} : {value}</Typography>
+                    ))}
                   </CardContent>
                   <CardActions>
                     <Button size="small">Book </Button>
@@ -151,7 +184,7 @@ export default function App() {
       {/* Footer */}
       <Box sx={{ bgcolor: "background.paper", p: 6 }} component="footer">
         <Typography variant="h6" align="center" gutterBottom>
-          Footer
+          Built with 🤟
         </Typography>
         <Typography
           variant="subtitle1"
@@ -159,7 +192,7 @@ export default function App() {
           color="text.secondary"
           component="p"
         >
-          Something here to give the footer a purpose!
+          Train Finder @2023
         </Typography>
         <Copyright />
       </Box>
@@ -167,3 +200,5 @@ export default function App() {
     </ThemeProvider>
   );
 }
+
+export default App;
