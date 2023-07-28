@@ -16,6 +16,27 @@ app.get('/numbers', async (req, res) => {
       return res.status(400).json({ error: 'invalid url' });
     
     }
+
+    try {
+        const fetchedData = await Promise.all(urls.map(fetchNumbers));
+    
+
+        //merging
+        const mergedNumbers = fetchedData.reduce((acc, numbers) => {
+          acc.push(...numbers);
+          return acc;
+        }, []);
+    
+    //sorting in ascending
+    mergedNumbers.sort((a, b) => a - b);
+    
+    const uniqueNumbers = Array.from(new Set(mergedNumbers));
+
+    res.json({ numbers: uniqueNumbers });
+    
+      } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+      }
 })
 
 
